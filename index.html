@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的导航页</title>
+    <style>
+        /* ========== 所有CSS样式 ========== */
+        :root {
+            --card-bg: rgba(255, 255, 255, 0.85);
+            --card-bg-hover: rgba(255, 255, 255, 0.95);
+            --text-color: #2c3e50;
+            --text-secondary: #5a6c7d;
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.10);
+            --shadow-hover: 0 16px 40px rgba(0, 0, 0, 0.16);
+            --accent: #5b7fff;
+            --accent-hover: #4a6aee;
+            --danger: #e0556a;
+            --danger-hover: #c94a5d;
+            --border: rgba(255, 255, 255, 0.3);
+            --modal-bg: #ffffff;
+            --input-bg: #f5f7fa;
+            --input-border: #dde3ed;
+            --radius-sm: 10px;
+            --radius: 18px;
+            --radius-lg: 22px;
+            --radius-xl: 28px;
+            --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --font: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', 'Helvetica Neue', sans-serif;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: var(--font);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #e8eaf6 0%, #f5f0e8 25%, #e8f0f5 50%, #f0e8f0 75%, #e8ecf5 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 20s ease infinite;
+            transition: background 0.6s ease;
+            position: relative;
+            overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            25% { background-position: 100% 0%; }
+            50% { background-position: 100% 100%; }
+            75% { background-position: 0% 100%; }
+        }
+        body.has-custom-bg { animation: none; background: #1a1a2e; background-size: cover; background-position: center; background-repeat: no-repeat; background-attachment: fixed; }
+        body.has-custom-bg::before { content: ''; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.35); z-index: 0; pointer-events: none; }
+        .bg-particles { position: fixed; inset: 0; pointer-events: none; z-index: 0; opacity: 0.5; }
+        body.has-custom-bg .bg-particles { opacity: 0.25; }
+        .bg-particle { position: absolute; border-radius: 50%; background: rgba(255, 255, 255, 0.5); animation: floatUp linear infinite; }
+        @keyframes floatUp {
+            0% { transform: translateY(105vh) scale(0); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-10vh) scale(1.2); opacity: 0; }
+        }
+        .settings-btn {
+    position: fixed; top: 24px; right: 28px; z-index: 1000; width: 46px; height: 46px; border-radius: 50%;
+    background: rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06), 0 0 0 0.5px rgba(255, 255, 255, 0.5);
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    transition: var(--transition); outline: none; color: #4a5568;
+}
+.settings-btn:hover {
+    background: rgba(255, 255, 255, 0.35);
+    backdrop-filter: blur(24px) saturate(200%);
+    -webkit-backdrop-filter: blur(24px) saturate(200%);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(255, 255, 255, 0.6);
+    transform: rotate(30deg);
+}
+.settings-btn:active { transform: rotate(60deg) scale(0.92); transition: 0.15s ease; }
+.settings-btn svg { width: 22px; height: 22px; pointer-events: none; transition: inherit; }
+        .dropdown-menu {
+    position: fixed; top: 80px; right: 28px; z-index: 999;
+    background: rgba(255, 255, 255, 0.35);
+    backdrop-filter: blur(30px) saturate(200%);
+    -webkit-backdrop-filter: blur(30px) saturate(200%);
+    border-radius: 18px;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12), 0 0 0 0.5px rgba(255, 255, 255, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    min-width: 200px; padding: 8px 0;
+    opacity: 0; visibility: hidden; transform: translateY(-10px) scale(0.94);
+    transition: var(--transition); pointer-events: none; overflow: hidden;
+}
+.dropdown-menu.active {
+    opacity: 1; visibility: visible; transform: translateY(0) scale(1); pointer-events: auto;
+}
+        .dropdown-menu .menu-item {
+    display: flex; align-items: center; gap: 12px; padding: 12px 20px;
+    cursor: pointer; transition: background 0.25s ease;
+    color: #2d3748; font-size: 15px; font-weight: 500;
+    letter-spacing: 0.3px; border: none; background: none; width: 100%;
+    text-align: left; font-family: var(--font); white-space: nowrap;
+}
+.dropdown-menu .menu-item:hover {
+    background: rgba(255, 255, 255, 0.45);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    color: #1a202c;
+}
+.dropdown-menu .menu-item:active {
+    background: rgba(255, 255, 255, 0.6);
+}
+.dropdown-menu .menu-divider {
+    height: 1px; background: rgba(255, 255, 255, 0.4); margin: 4px 12px;
+}
+        .dropdown-menu .menu-item svg { width: 18px; height: 18px; flex-shrink: 0; opacity: 0.7; }
+        .main-content { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; gap: 40px; padding: 20px; }
+        .greeting { text-align: center; color: #3a3f4a; }
+        .greeting .time-display { font-size: 4.5rem; font-weight: 300; letter-spacing: -1px; line-height: 1; color: #2c3e50; text-shadow: 0 2px 8px rgba(0, 0, 0, 0.04); }
+        .greeting .date-display { font-size: 1.15rem; font-weight: 400; color: #6b7d8e; margin-top: 6px; letter-spacing: 1px; }
+        .greeting .welcome-text { font-size: 1.3rem; font-weight: 400; color: #5a6c7d; margin-top: 4px; letter-spacing: 0.5px; }
+        body.has-custom-bg .greeting .time-display { color: #ffffff; text-shadow: 0 2px 16px rgba(0, 0, 0, 0.25); }
+        body.has-custom-bg .greeting .date-display { color: rgba(255, 255, 255, 0.85); }
+        body.has-custom-bg .greeting .welcome-text { color: rgba(255, 255, 255, 0.8); }
+        .shortcuts-container { display: flex; gap: 24px; flex-wrap: wrap; justify-content: center; }
+        .shortcut-card {
+            display: flex; flex-direction: column; align-items: center; justify-content: center; width: 160px; height: 170px;
+            background: var(--card-bg); backdrop-filter: blur(16px); border-radius: var(--radius-lg); box-shadow: var(--shadow);
+            cursor: pointer; transition: var(--transition); text-decoration: none; color: var(--text-color);
+            border: 1.5px solid var(--border); position: relative; overflow: hidden; gap: 14px;
+        }
+        .shortcut-card::after { content: ''; position: absolute; inset: 0; border-radius: inherit; opacity: 0; transition: opacity 0.4s ease; background: radial-gradient(circle at center, rgba(91,127,255,0.06) 0%, transparent 70%); pointer-events: none; }
+        .shortcut-card:hover { transform: translateY(-8px); box-shadow: var(--shadow-hover); border-color: rgba(91,127,255,0.4); background: var(--card-bg-hover); }
+        .shortcut-card:hover::after { opacity: 1; }
+        .shortcut-card:active { transform: translateY(-3px) scale(0.96); transition: 0.15s ease; }
+        .shortcut-card .card-icon { width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; background: linear-gradient(135deg, #f0f3ff 0%, #e8ecf8 100%); transition: var(--transition); flex-shrink: 0; position: relative; z-index: 1; }
+        .shortcut-card:hover .card-icon { transform: scale(1.08); background: linear-gradient(135deg, #e4e9ff 0%, #dde3f8 100%); }
+        .shortcut-card .card-name { font-size: 1rem; font-weight: 600; letter-spacing: 0.4px; position: relative; z-index: 1; text-align: center; line-height: 1.3; max-width: 130px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .shortcut-card .card-hint { font-size: 0.7rem; color: #a0aec0; letter-spacing: 0.5px; opacity: 0; transform: translateY(4px); transition: var(--transition); position: relative; z-index: 1; }
+        .shortcut-card:hover .card-hint { opacity: 1; transform: translateY(0); }
+        .shortcut-card.placeholder { border-style: dashed; border-color: rgba(0,0,0,0.15); background: rgba(255,255,255,0.45); cursor: default; }
+        .shortcut-card.placeholder:hover { transform: none; box-shadow: var(--shadow); border-color: rgba(0,0,0,0.2); background: rgba(255,255,255,0.55); }
+        .shortcut-card.placeholder .card-icon { background: rgba(0,0,0,0.04); color: #b0b8c4; }
+        .shortcut-card.placeholder .card-name { color: #b0b8c4; font-weight: 400; font-style: italic; }
+        body.has-custom-bg .shortcut-card { background: rgba(255,255,255,0.78); border-color: rgba(255,255,255,0.35); color: #2c3e50; }
+        body.has-custom-bg .shortcut-card:hover { background: rgba(255,255,255,0.9); }
+        body.has-custom-bg .shortcut-card.placeholder { background: rgba(255,255,255,0.35); border-color: rgba(255,255,255,0.3); }
+        .modal-overlay { position: fixed; inset: 0; z-index: 2000; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; opacity: 0; visibility: hidden; transition: var(--transition); pointer-events: none; }
+        .modal-overlay.active { opacity: 1; visibility: visible; pointer-events: auto; }
+        .modal-dialog { background: var(--modal-bg); border-radius: var(--radius-xl); box-shadow: 0 24px 60px rgba(0,0,0,0.25); padding: 32px 28px 24px; max-width: 500px; width: 90%; max-height: 85vh; overflow-y: auto; transform: translateY(20px) scale(0.95); transition: var(--transition); position: relative; }
+        .modal-overlay.active .modal-dialog { transform: translateY(0) scale(1); }
+        .modal-dialog h3 { font-size: 1.35rem; font-weight: 700; margin-bottom: 20px; color: #2c3e50; letter-spacing: 0.3px; text-align: center; }
+        .modal-dialog .form-group { margin-bottom: 16px; }
+        .modal-dialog label { display: block; font-size: 0.85rem; font-weight: 600; color: #5a6c7d; margin-bottom: 6px; letter-spacing: 0.3px; }
+        .modal-dialog input[type="text"], .modal-dialog input[type="url"] { width: 100%; padding: 12px 16px; border: 2px solid var(--input-border); border-radius: var(--radius-sm); font-size: 0.95rem; font-family: var(--font); transition: var(--transition); background: var(--input-bg); color: #2c3e50; outline: none; }
+        .modal-dialog input[type="text"]:focus, .modal-dialog input[type="url"]:focus { border-color: var(--accent); box-shadow: 0 0 0 4px rgba(91,127,255,0.08); background: #fff; }
+        .modal-dialog .btn-row { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-top: 8px; }
+        .btn { padding: 11px 22px; border-radius: 50px; font-size: 0.9rem; font-weight: 600; cursor: pointer; border: none; font-family: var(--font); letter-spacing: 0.4px; transition: var(--transition); outline: none; white-space: nowrap; }
+        .btn-primary { background: var(--accent); color: #fff; box-shadow: 0 4px 14px rgba(91,127,255,0.3); }
+        .btn-primary:hover { background: var(--accent-hover); box-shadow: 0 6px 20px rgba(91,127,255,0.4); transform: translateY(-1px); }
+        .btn-outline { background: transparent; border: 2px solid #dde3ed; color: #5a6c7d; }
+        .btn-outline:hover { border-color: #bcc5d4; background: #f9fafb; }
+        .btn-danger { background: transparent; border: 2px solid #fdd; color: var(--danger); }
+        .btn-danger:hover { background: #fff5f5; border-color: var(--danger); }
+        .btn-close-modal { position: absolute; top: 14px; right: 18px; width: 34px; height: 34px; border-radius: 50%; background: rgba(0,0,0,0.04); border: none; cursor: pointer; font-size: 1.2rem; color: #888; transition: var(--transition); display: flex; align-items: center; justify-content: center; }
+        .btn-close-modal:hover { background: rgba(0,0,0,0.1); color: #333; }
+        .upload-zone { border: 2px dashed var(--input-border); border-radius: var(--radius); padding: 28px 20px; text-align: center; cursor: pointer; transition: var(--transition); background: var(--input-bg); color: #8899aa; font-size: 0.9rem; letter-spacing: 0.3px; }
+        .upload-zone:hover { border-color: var(--accent); background: rgba(91,127,255,0.03); color: #5a6c7d; }
+        .upload-zone .upload-icon { font-size: 2.4rem; margin-bottom: 8px; display: block; }
+        .preset-grid { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 8px; }
+        .preset-swatch { width: 44px; height: 44px; border-radius: 50%; cursor: pointer; border: 3px solid transparent; transition: var(--transition); box-shadow: 0 3px 10px rgba(0,0,0,0.08); flex-shrink: 0; }
+        .preset-swatch:hover { transform: scale(1.15); border-color: var(--accent); box-shadow: 0 6px 18px rgba(0,0,0,0.16); }
+        .preset-swatch.selected { border-color: var(--accent); box-shadow: 0 0 0 5px rgba(91,127,255,0.2); }
+        .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(80px); background: #2c3e50; color: #fff; padding: 12px 24px; border-radius: 50px; font-size: 0.9rem; font-weight: 500; letter-spacing: 0.3px; z-index: 3000; pointer-events: none; opacity: 0; transition: var(--transition); box-shadow: 0 8px 24px rgba(0,0,0,0.25); font-family: var(--font); }
+        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+        @media (max-width: 640px) {
+            .shortcuts-container { gap: 16px; }
+            .shortcut-card { width: 130px; height: 145px; border-radius: var(--radius); gap: 10px; }
+            .shortcut-card .card-icon { width: 50px; height: 50px; font-size: 1.6rem; }
+            .shortcut-card .card-name { font-size: 0.9rem; max-width: 100px; }
+            .greeting .time-display { font-size: 3rem; }
+            .greeting .date-display { font-size: 1rem; }
+            .greeting .welcome-text { font-size: 1.05rem; }
+            .main-content { gap: 28px; }
+            .settings-btn { top: 14px; right: 14px; width: 40px; height: 40px; }
+            .settings-btn svg { width: 19px; height: 19px; }
+            .dropdown-menu { top: 64px; right: 14px; min-width: 170px; border-radius: var(--radius); }
+            .dropdown-menu .menu-item { padding: 11px 16px; font-size: 14px; }
+            .modal-dialog { padding: 24px 18px 18px; border-radius: var(--radius-lg); }
+        }
+        @media (max-width: 380px) {
+            .shortcut-card { width: 100px; height: 120px; gap: 8px; border-radius: 14px; }
+            .shortcut-card .card-icon { width: 42px; height: 42px; font-size: 1.3rem; }
+            .shortcut-card .card-name { font-size: 0.78rem; max-width: 80px; }
+            .shortcuts-container { gap: 10px; }
+            .greeting .time-display { font-size: 2.4rem; }
+        }
+        .card-icon-img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border-radius: 50%;
+}body.dark-bg .greeting .time-display,
+body.dark-bg .greeting .date-display,
+body.dark-bg .greeting .welcome-text {
+    color: #ffffff;
+    text-shadow: 0 2px 12px rgba(0,0,0,0.4);
+}
+/* 深色背景下设置按钮和菜单适配 */
+body.has-custom-bg .settings-btn,
+body.dark-bg .settings-btn {
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+body.has-custom-bg .settings-btn:hover,
+body.dark-bg .settings-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+body.has-custom-bg .dropdown-menu,
+body.dark-bg .dropdown-menu {
+    background: rgba(0, 0, 0, 0.45);
+    color: #fff;
+    border-color: rgba(255, 255, 255, 0.2);
+}
+body.has-custom-bg .dropdown-menu .menu-item,
+body.dark-bg .dropdown-menu .menu-item {
+    color: #f0f0f0;
+}
+body.has-custom-bg .dropdown-menu .menu-item:hover,
+body.dark-bg .dropdown-menu .menu-item:hover {
+    background: rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+}
+body.has-custom-bg .dropdown-menu .menu-divider,
+body.dark-bg .dropdown-menu .menu-divider {
+    background: rgba(255, 255, 255, 0.2);
+}
+.main-content {
+    transform: translateY(-11.8vh);   /* 上移 11.8% 视口高度，大约达到黄金分割点 */
+}
+body.modal-open {
+    overscroll-behavior-x: none;   /* 禁止浏览器水平手势 */
+    touch-action: pan-y;           /* 触摸屏仅允许垂直滚动 */
+}
+@media (max-width: 640px) {
+    .main-content {
+        transform: translateY(-8vh);
+    }
+}
+    </style>
+</head>
+<body>
+    <!-- 背景装饰粒子 -->
+    <div class="bg-particles" id="bgParticles"></div>
+
+    <!-- 设置按钮 -->
+    <button class="settings-btn" id="settingsBtn" title="设置" aria-label="设置">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+        </svg>
+    </button>
+
+    <!-- 下拉菜单 -->
+    <div class="dropdown-menu" id="dropdownMenu">
+        <button class="menu-item" id="menuBg">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                <polyline points="21 15 16 10 5 21"></polyline>
+            </svg>
+            背景设置
+        </button>
+        <div class="menu-divider"></div>
+        <button class="menu-item" id="menuEdit">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+            </svg>
+            编辑快捷方式
+        </button>
+    </div>
+
+    <!-- 主内容区 -->
+    <div class="main-content">
+        <div class="greeting">
+            <div class="time-display" id="timeDisplay">12:00</div>
+            <div class="date-display" id="dateDisplay"></div>
+            <div class="welcome-text" id="welcomeText">下午好</div>
+        </div>
+        <div class="shortcuts-container" id="shortcutsContainer"></div>
+    </div>
+
+    <!-- 背景设置模态框 -->
+    <div class="modal-overlay" id="bgModalOverlay">
+        <div class="modal-dialog">
+            <button class="btn-close-modal" id="bgModalClose">✕</button>
+            <h3>🖼️ 背景设置</h3>
+            <div class="form-group">
+                <label>📁 上传本地图片</label>
+                <div class="upload-zone" id="uploadZone">
+                    <span class="upload-icon">📤</span>
+                    点击上传或拖拽图片到此处
+                    <br><small style="opacity:0.7;">支持 JPG / PNG / WebP，建议小于 3MB</small>
+                </div>
+                <input type="file" id="fileInput" accept="image/*" style="display:none;">
+            </div>
+            <div class="form-group">
+                <label>🔗 或输入图片URL</label>
+                <input type="url" id="bgUrlInput" placeholder="https://example.com/bg.jpg">
+            </div>
+            <div class="form-group">
+                <label>🎨 预设背景</label>
+                <div class="preset-grid" id="presetGrid">
+                    <div class="preset-swatch" data-preset="gradient1" style="background:linear-gradient(135deg,#e8eaf6,#f5f0e8,#e8f0f5);" title="默认渐变"></div>
+                    <div class="preset-swatch" data-preset="gradient2" style="background:linear-gradient(135deg,#ffecd2,#fcb69f);" title="暖橘"></div>
+                    <div class="preset-swatch" data-preset="gradient3" style="background:linear-gradient(135deg,#a1c4fd,#c2e9fb);" title="天空蓝"></div>
+                    <div class="preset-swatch" data-preset="gradient4" style="background:linear-gradient(135deg,#d4fc79,#96e6a1);" title="清新绿"></div>
+                    <div class="preset-swatch" data-preset="gradient5" style="background:linear-gradient(135deg,#fbc2eb,#a6c1ee);" title="梦幻紫"></div>
+                    <div class="preset-swatch" data-preset="gradient6" style="background:linear-gradient(135deg,#2c3e50,#4a5568,#1a1a2e);" title="深色"></div>
+                </div>
+            </div>
+            <div class="btn-row">
+                <button class="btn btn-primary" id="bgSaveBtn">💾 保存背景</button>
+                <button class="btn btn-danger" id="bgResetBtn">🔄 重置为默认</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 编辑快捷方式模态框 -->
+    <div class="modal-overlay" id="editModalOverlay">
+        <div class="modal-dialog">
+            <button class="btn-close-modal" id="editModalClose">✕</button>
+            <h3>✏️ 编辑快捷方式</h3>
+            <div id="editFormFields"></div>
+            <div class="btn-row">
+                <button class="btn btn-primary" id="editSaveBtn">💾 保存修改</button>
+                <button class="btn btn-outline" id="editCancelBtn">取消</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast 提示 -->
+    <div class="toast" id="toast"></div>
+
+    <!-- 按顺序引入JS模块 -->
+    <script src="js/state.js"></script>
+    <script src="js/db.js"></script>
+    <script src="js/time.js"></script>
+    <script src="js/background.js"></script>
+    <script src="js/shortcuts.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
